@@ -1,0 +1,73 @@
+﻿@{
+    ViewData["Title"] = "Student Profile";
+}
+
+<div class="text-left">
+    <h1 class="display-6">Student Profiles</h1>
+</div>
+<div class="row">
+    <div class="col-6"></div>
+    <div class="col-6 text-end">
+        <a href="@Url.Action("_AddProfile", "Profiles")" class="btn btn-outline-secondary" data-modal="" aria-expanded="false" title="">Add Profile</a>
+    </div>
+</div>
+<div class="row mt-2">
+    <div class="md-12">
+        <div id="dvDataList"></div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        $(function () {
+            loadView();
+        });
+    </script>
+    <script>
+        function loadView() {
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("_ProfileList", "Profiles")',
+                success: function (data) {
+                    $("#dvDataList").html("");
+                    $("#dvDataList").html(data);
+                },
+                cache: false,
+                complete: function () {
+
+                }
+            });
+        }
+    </script>
+    <script>
+        function deleteItem(id) {
+            if (id === null || id === "" || parseInt(id) < 1) {
+                return showAlert("Selection Error", "Invalid Selection", 0);
+            }
+
+            return confirmDelete("Delete Confirmation", "Student's Profile will be removed! Are you sure?", doDelete.bind(null, id));
+
+        }
+        function doDelete(id) {
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("RemoveProfile", "Profiles")?id=' + parseInt(id),
+                success: function (data) {
+
+                    if (!data.IsSuccessful) {
+                        var retError = data.Error ? data.Error : "Unknown error occured. Please try again later!";
+                        $("#dvError").html(`<span class='alaert alert-danger'>${retError}</span>`);
+                        return showAlert("Process Error", retError, 0);
+                    }
+                    return showAlertAndReload("Profile Removed!", "Student's Profile Was Removed Successfully", 1);
+                },
+                cache: false,
+                complete: function () {
+
+                }
+            });
+            return false;
+        }
+    </script>
+}

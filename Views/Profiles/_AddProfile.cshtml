@@ -1,0 +1,128 @@
+﻿@model Profile
+@{
+    Layout = null;
+}
+<div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+        <div class="modal-header d-flex align-items-center">
+            <h5 class="modal-title">Add Profile</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div id="popupViewDiv">
+                <form method="post" id="frmAdd" data-parsley-validate="">
+                    <div class="row">
+                        @*  @if (hasError)
+                        {
+                        <div class="form-group">
+                        <div class="alert alert-danger">@Html.Raw(error)</div>
+                        </div>
+                        } *@
+
+                        <div id="dvError"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label class="pb-1">Surname</label>
+                                <input type="text" class="form-control" asp-for="Surname" required="" data-parsley-required-message="@P_Validations.SURNAME_REQUIRED">
+                                <span asp-validation-for="Surname"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label class="pb-1">First Name</label>
+                                <input type="text" class="form-control" asp-for="FirstName" required="" data-parsley-required-message="@P_Validations.FIRST_NAME_REQUIRED">
+                                <span asp-validation-for="FirstName"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label class="pb-1">Other Names</label>
+                                <input type="text" class="form-control" asp-for="OtherNames" required="" data-parsley-required-message="@P_Validations.OTHER_NAMES_REQUIRED">
+                                <span asp-validation-for="OtherNames"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="pb-1">Date of Birth</label>
+                                <input type="date" class="form-control" asp-for="DateOfBirth" required="" data-parsley-required-message="@P_Validations.DATE_OF_BIRTH_REQUIRED">
+                                <span asp-validation-for="DateOfBirth"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="pb-1">Gender</label> <br />
+                                <select asp-for="Gender" class="form-control" data-parsley-required-message="Gender is required">
+                                    <option value="0" selected> -- Please Select -- </option>
+                                    <option value="1">Male</option>
+                                    <option value="2">Female</option>
+                                </select>
+                                <span asp-validation-for="Gender"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label class="pb-1">Email</label>
+                                <input type="email" class="form-control" asp-for="Email" required="" data-parsley-required-message="@P_Validations.EMAIL_REQUIRED">
+                                <span asp-validation-for="Email"></span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="d-flex gap-6 m-0">
+                <button type="button" id="btnSaveData" onclick="saveData();" class="btn btn-success">Add</button>
+                <button class="btn bg-danger-subtle text-danger" data-bs-dismiss="modal">Discard</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function saveData() {
+        const frm = $("#frmAdd");
+        $(frm).parsley();
+
+        $(frm).parsley();
+        $(frm).parsley().validate();
+        if (!$(frm).parsley().isValid()) {
+            $("#dvError").html(`<span class='alaert alert-danger'>Validation Error Occurred</span>`)
+            return false;
+        }
+
+        const frmData = frm.serializeArray();
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("AddProfile", "Profiles")',
+            data: frmData,
+            success: function (data) {
+
+                if (!data.IsSuccessful) {
+                    var retError = data.Error ? data.Error : "Unknown error occured. Please try again later!";
+                    $("#dvError").html(`<span class='alaert alert-danger'>${retError}</span>`);
+                    return showAlert("Process Error", retError, 0);
+                }
+                return showAlertAndReload("Profile Saved!", "Student's Profile Was Saved Successfully", 1);
+            },
+            cache: false,
+            complete: function () {
+
+            }
+        });
+        return false;
+    }
+</script>
